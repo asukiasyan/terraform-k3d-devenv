@@ -1,0 +1,56 @@
+---
+version: "2"
+
+env:
+  TERRAFORM_BINARY: terraform
+
+
+tasks:
+  clear:
+    silent: true
+    cmds:
+      - echo "Removing terraform cache..."
+      - rm -rf k8s/.terraform
+
+  build:
+    cmds:
+      - echo "Building docker image"
+      - cd source/ && docker build -t asukiasyan/flaskwebapp:latest .
+
+  push:
+    cmds:
+      - echo "Pushing Docker image to hub"
+      - cd source/ && docker login --username=asukiasyan && docker push asukiasyan/flaskwebapp:latest
+
+  init:
+    cmds:
+      - terraform init
+
+  plan:
+    cmds:
+      - terraform plan
+
+  apply:
+    cmds:
+      - terraform apply
+
+
+  destroy:
+    cmds:
+      - terraform destroy
+
+  docs:
+    cmds:
+      - terraform-docs md .
+
+  clear:
+    silent: true
+    cmds:
+      - echo "Removing Decryped Vault Files"
+      - |
+        for NAME in $(ls *.vault) ; do \
+        rm -f "${NAME%.vault}"; \
+        done
+      - echo "Removing .terraform cache"
+      - rm -rf .terraform
+
