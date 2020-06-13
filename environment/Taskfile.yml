@@ -4,6 +4,8 @@ version: "2"
 env:
   TERRAFORM_BINARY: terraform
 
+vars:
+  VAULT_PASSWD_FILE: ../../.vault.passwd
 
 tasks:
   clear:
@@ -54,3 +56,11 @@ tasks:
       - echo "Removing .terraform cache"
       - rm -rf .terraform
 
+  decrypt:
+    silent: true
+    cmds:
+      - echo "Decrypting vault files"
+      - |
+        for FILE in $(ls *.vault); do \
+        ansible-vault decrypt --vault-password-file={{.VAULT_PASSWD_FILE}} --output="${FILE%.vault}" "${FILE}"; \
+        done
